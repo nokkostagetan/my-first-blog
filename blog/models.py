@@ -2,6 +2,10 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
+class PostQuerySet(models.QuerySet):
+    def published(self):
+        return self.filter(published_date__lte=timezone.now())
+
 class Post(models.Model):
     #プロパティ author～published_dateまで
     # models.ForeignKey　他のモデルへのリンク
@@ -13,6 +17,8 @@ class Post(models.Model):
     # models.DateTimeField　日付と時間のフィールド
     create_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
+
+    objects = PostQuerySet.as_manager()
 
     def publish(self):
         self.published_date = timezone.now()
